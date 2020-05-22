@@ -1,0 +1,394 @@
+<!--
+
+** possibly undocumented attributes **
+
+<Link>:
+  swallow %bool; "false"?
+  locked %bool; "false"?
+
+The shared attribute:
+  js_id IDREF?
+
+<AssetImage>:
+  auto_play %bool; "false"?
+
+<Object>:
+  envmap_id IDREF?
+  xdir ?
+  ydir ?
+  zdir ?
+
+<Light>:
+  visible %bool; "true"?
+
+** to use this dtd **
+
+wrap your FireBoxRoom in:
+<jml></jml>
+
+and start the page off with:
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE jml PUBLIC "-//TBB//DTD JML 0.1//EN" "http://thebackupbox.net/jml.dtd">
+
+then use xmllint with the "valid" flag (I can't put a double-dash in an XML comment)
+
+]]>
+
+<!-- these entities stolen from the XHTML dtd -->
+<!ENTITY % URI "CDATA">
+
+<!-- made these up for JML -->
+<!ENTITY % bool "(true|false)">
+<!ENTITY % alpha "(undefined|none|cutout|blended)">
+<!ENTITY % colorspace "(sRGB|linear)">
+<!ENTITY % samplerate "CDATA">
+<!ENTITY % color "CDATA">
+<!ENTITY % real "CDATA">
+<!ENTITY % vector "CDATA">
+<!ENTITY % rect "CDATA">
+<!ENTITY % axisorder "(xyz|xzy|yxz|yzx|zxy|zyx)">
+<!ENTITY % fogmode "(exp|exp2|linear)">
+<!ENTITY % host "CDATA">
+<!ENTITY % port "CDATA">
+<!ENTITY % volume "CDATA">
+<!ENTITY % roomtemplate "(room1|room2|room3|room4|room5|room6|room1_pedestral|room_2_pedestal|room_3_narrow|room_3_wide|room_4_narrow|room_4_wide|room_box_small|room_box_medium|room1_new|room_plane)">
+<!-- not sure how to do this properly
+<!ENTITY % AssetObjectID "IDREF|(capsule|cone|cube|cylinder|pipe|plane|pyramid|sphere|torus)">
+not sure how to do this either. probably can't.
+<!ENTITY % collisionid "IDREF|(shapes?)"
+-->
+<!ENTITY % AssetObjectID "CDATA">
+<!ENTITY % CollisionID "CDATA">
+<!ENTITY % cullface "(back|front|none)">
+<!ENTITY % javascript "CDATA">
+
+
+<!ELEMENT jml (FireBoxRoom)>
+<!ATTLIST jml
+  xmlns	%URI; #IMPLIED
+>
+
+<!ELEMENT FireBoxRoom (Assets | Room)*>
+
+<!ELEMENT Assets (AssetImage | AssetSound | AssetVideo | AssetObject | AssetShader | AssetGhost | AssetWebSurface | AssetScript | AssetRecording)*>
+
+<!ELEMENT AssetImage EMPTY>
+<!ATTLIST AssetImage
+  id              ID           #REQUIRED
+  src             %URI;        #REQUIRED
+  sbs3d           %bool;       "false"
+  ou3d            %bool;       "false"
+  reverse3d       %bool;       "false"
+  tex_clamp       %bool;       "false"
+  tex_linear      %bool;       "true"
+  tex_compress    %bool;       "false"
+  tex_alpha       %alpha;      "undefined"
+  tex_premultiply %bool;       "true"
+  tex_colorspace  %colorspace; "sRGB"
+>
+
+<!ELEMENT AssetSound EMPTY>
+<!ATTLIST AssetSound
+  id  ID    #REQUIRED
+  src %URI; #REQUIRED
+>
+
+<!ELEMENT AssetVideo EMPTY>
+<!ATTLIST AssetVideo
+  id           ID     #REQUIRED
+  src          %URI;  #REQUIRED
+  loop         %bool; "false"
+  auto_play    %bool; "false"
+  tex_compress %bool; "false"
+  sbs3d        %bool; "false"
+  ou3d         %bool; "false"
+  reverse3d    %bool; "false"
+>
+
+<!ELEMENT AssetObject EMPTY>
+<!-- I'm not sure what type tex0,tex1,tex2,tex3 are. using URI atm -->
+<!ATTLIST AssetObject
+  id              ID           #REQUIRED
+  src             %URI;        #REQUIRED
+  tex0            %URI;        ""
+  tex1            %URI;        ""
+  tex2            %URI;        ""
+  tex3            %URI;        ""
+  mtl             %URI;        ""
+  tex_clamp       %bool;       "false"
+  tex_linear      %bool;       "true"
+  tex_compress    %bool;       "false"
+  tex_mipmap      %bool;       "true"
+  tex_alpha       %alpha;      "undefined"
+  tex_premultiply %bool;       "true"
+  tex_colorspace  %colorspace; "sRGB"
+>
+
+<!ELEMENT AssetShader EMPTY>
+<!ATTLIST AssetShader
+  id         ID    #REQUIRED
+  src        %URI; #REQUIRED
+  vertex_src %URI; ""
+>
+
+<!ELEMENT AssetGhost EMPTY>
+<!ATTLIST AssetGhost
+  id  ID    #REQUIRED
+  src %URI; #REQUIRED
+>
+
+<!ELEMENT AssetWebSurface EMPTY>
+<!ATTLIST AssetWebSurface
+  id           ID     #REQUIRED
+  src          %URI;  #REQUIRED
+  width        %real; #REQUIRED
+  height       %real; #REQUIRED
+  show_url_bar %bool; "false"
+>
+
+<!ELEMENT AssetScript EMPTY>
+<!ATTLIST AssetScript
+  id  ID    #IMPLIED
+  src %URI; #REQUIRED
+>
+
+<!ELEMENT AssetRecording EMPTY>
+<!ATTLIST AssetRecording
+  id          ID           #REQUIRED
+  src         %URI;        #REQUIRED
+  auto_play   %bool;       "false"
+  loop        %bool;       "false"
+  sample_rate %samplerate; "44100"  
+>
+
+<!ELEMENT Room (Object | Text | Paragraph | Link | Image | Sound | Video | Ghost | Particle | Light)*>
+<!ATTLIST Room
+  skybox_left_id        IDREF          #IMPLIED
+  skybox_right_id       IDREF          #IMPLIED
+  skybox_front_id       IDREF          #IMPLIED
+  skybox_back_id        IDREF          #IMPLIED
+  skybox_up_id          IDREF          #IMPLIED
+  skybox_down_id        IDREF          #IMPLIED
+  use_local_asset       %roomtemplate; #IMPLIED
+  col                   %color;        "#ffffff"
+  visible               %bool;         "true"
+  pos                   %vector;       "0 0 0"
+  fwd                   %vector;       "0 0 0"
+  xdir                  %vector;       "1 0 0"
+  ydir                  %vector;       "0 1 0"
+  zdir                  %vector;       "0 0 1"
+  rotation              %vector;       "0 0 0"
+  rotation_order        %axisorder;    "xyz"
+  near_dist             %real;         "0.0025"
+  far_dist              %real;         "500"
+  jump_velocity         %real;         "5.0"
+  walk_speed            %real;         "1.8"
+  run_speed             %real;         "5.4"
+  gravity               %real;         "-9.8"
+  cursor_visible        %bool;         "true"
+  party_mode            %bool;         "true"
+  fog                   %bool;         "false"
+  fog_mode              %fogmode;      "exp"
+  fog_density           %real;         "1.0"
+  fog_start             %real;         "0.0"
+  fog_end               %real;         "1.0"
+  fog_col               %color;        "0 0 0"
+  teleport_min_dist     %real;         "5.0"
+  teleport_max_dist     %real;         "100.0"
+  shader_id             IDREF          #IMPLIED
+  server                %host;         "presence.janusvr.com"
+  port                  %port;         "5566"
+  rate                  %real;         "200"
+  grab_dist             %real;         "0.5"
+  reset_volume          %volume;       "-FLT_MAX -FLT_MAX -FLT_MAX FLT_MAX -100.0f FLT_MAX"
+  cubemap_radiance_id   IDREF          #IMPLIED
+  cubemap_irradiance_id IDREF          #IMPLIED
+>
+
+<!ELEMENT Text (#PCDATA)>
+<!ATTLIST Text
+  pos            %vector;    "0 0 0"
+  fwd            %vector;    "0 0 1"
+  rotation       %vector;    "0 0 0"
+  rotation_order %axisorder; "xyz"
+  col            %color;     "#ffffff"
+  scale          %vector;    "1 1 1"
+  locked         %bool;      "false"
+  lighting       %bool;      "true"
+  draw_layer     %real;      "0"
+>
+
+<!ELEMENT Object EMPTY>
+<!ATTLIST Object
+  id                            %AssetObjectID; #REQUIRED
+  pos                           %vector;        "0 0 0"
+  fwd                           %vector;        "0 0 1"
+  vel                           %real;          "0"
+  rotation                      %vector;        "0 0 0"
+  rotation_order                %axisorder;     "xyz"
+  col                           %color;         "#ffffff"
+  scale                         %vector;        "1 1 1"
+  locked                        %bool;          "false"
+  cull_face                     %cullface;      "back"
+  rotate_axis                   %vector;        "0 1 0"
+  rotate_deg_per_sec            %real;          "0"
+  video_id                      IDREF           #IMPLIED
+  image_id                      IDREF           #IMPLIED
+  shader_id                     IDREF           #IMPLIED
+  websurface_id                 IDREF           #IMPLIED
+  thumb_id                      IDREF           #IMPLIED
+  lighting                      %bool;          "true"
+  anim_id                       IDREF           #IMPLIED
+  anim_speed                    %real;          "1.0"
+  loop                          %bool;          "false"
+  visible                       %bool;          "true"
+  collision_ccdmotionthreshold  %real;          "1.0"
+  collision_ccdswptsphereradius %real;          "0.0"
+  collision_id                  %CollisionID;   #IMPLIED
+  collision_trigger             %bool;          "false"
+  collision_radius              %real;          "0"
+  collision_pos                 %vector;        "0 0 0"
+  collision_scale               %vector;        "1 1 1"
+  collision_static              %bool;          "true"
+  teleport_id                   IDREF           #IMPLIED
+  draw_layer                    %real;          "0"
+  onclick                       %javascript;    #IMPLIED
+  cubemap_radiance_id           IDREF           #IMPLIED
+  cubemap_irradiance_id         IDREF           #IMPLIED
+>
+
+<!ELEMENT Paragraph (#PCDATA)>
+<!ATTLIST Paragraph
+  pos            %vector;    "0 0 0"
+  fwd            %vector;    "0 0 1"
+  rotation       %vector;    "0 0 0"
+  rotation_order %axisorder; "xyz"
+  col            %color;     "#ffffff"
+  scale          %vector;    "1 1 1"
+  locked         %bool;      "false"
+  lighting       %bool;      "true"
+  draw_layer     %real;      "0"
+  font_size      %real;      "16"
+  text_col       %color;     "#000000"
+  back_col       %color;     "#ffffff"
+  back_alpha     %real;      "1"
+>
+
+<!ELEMENT Link EMPTY>
+<!ATTLIST Link
+  url            %URI;       #REQUIRED
+  title          CDATA       #IMPLIED
+  pos            %vector;    "0 0 0"
+  fwd            %vector;    "0 0 1"
+  rotation       %vector;    "0 0 0"
+  rotation_order %axisorder; "xyz"
+  col            %color;     "#ffffff"
+  scale          %vector;    "1 1 1"
+  draw_glow      %bool;      "true"
+  draw_text      %bool;      "true"
+  auto_load      %bool;      "false"
+  thumb_id       IDREF       #IMPLIED
+  draw_layer     %real;      "0"
+  mirror         %bool;      "false"
+>
+
+<!ELEMENT Image EMPTY>
+<!ATTLIST Image
+  id             IDREF       #REQUIRED
+  pos            %vector;    "0 0 0"
+  fwd            %vector;    "0 0 1"
+  rotation       %vector;    "0 0 0"
+  rotation_order %axisorder; "xyz"
+  col            %color;     "#ffffff"
+  scale          %vector;    "1 1 1"
+  locked         %bool;      "false"
+  lighting       %bool;      "true"
+  draw_layer     %real;      "0"
+>
+
+<!ELEMENT Sound EMPTY>
+<!ATTLIST Sound
+  id        IDREF    #REQUIRED
+  rect      %rect;   "0 0 0 0"
+  loop      %bool;   "false"
+  play_once %bool;   "false"
+  pos       %vector; "0 0 0"
+  dist      %real;   "1.0"
+  gain      %real;   "1.0"
+  pitch     %real;   "1.0"
+>
+
+<!ELEMENT Video EMPTY>
+<!ATTLIST Video
+  id             IDREF       #REQUIRED
+  thumb_id       IDREF       #IMPLIED
+  pos            %vector;    "0 0 0"
+  fwd            %vector;    "0 0 1"
+  rotation       %vector;    "0 0 0"
+  rotation_order %axisorder; "xyz"
+  col            %color;     "#ffffff"
+  scale          %vector;    "1 1 1"
+  locked         %bool;      "false"
+  lighting       %bool;      "true"
+  draw_layer     %real;      "0"
+  gain           %real;      "1.0"
+>
+
+<!ELEMENT Ghost EMPTY>
+<!ATTLIST Ghost
+  id          IDREF      #REQUIRED
+  cull_face   %cullface; "back"
+  col         %color;    "#ffffff"
+  scale       %vector;   "1 1 1"
+  locked      %bool;     "false"
+  head_id     IDREF      #IMPLIED
+  head_pos    %vector;   "0 1 0"
+  eye_pos     %vector;   "0 1.6 0"
+  eye_ipd     %real;     "0"
+  body_id     IDREF      #IMPLIED
+  shader_id   IDREF      #IMPLIED
+  loop        %bool;     "false"
+  auto_play   %bool;     "false"
+  lighting    %bool;     "true"
+  userid_post %vector;   "0 0 0"
+  draw_layer  %real;     "0"
+>
+
+<!ELEMENT Particle EMPTY>
+<!ATTLIST Particle
+  image_id   IDREF    #IMPLIED
+  id         IDREF    #IMPLIED
+  rate       %real;   "1"
+  count      %real;   "0"
+  duration   %real;   "1.0"
+  fade_in    %real;   "1.0"
+  fade_out   %real;   "1.0"
+  pos        %vector; "0 0 0"
+  vel        %vector; "0 0 0"
+  accel      %vector; "0 0 0"
+  col        %color;  "#ffffff"
+  scale      %vector; "1 1 1"
+  rand_pos   %vector; "0 0 0"
+  rand_vel   %vector; "0 0 0"
+  rand_accel %vector; "0 0 0"
+  rand_col   %vector; "0 0 0"
+  rand_scale %vector; "0 0 0"
+  lighting   %bool;   "true"
+  loop       %bool;   "false"
+  draw_layer %real;   "0"
+  emit_local %bool;   "false"
+  emitter_id IDREF    #IMPLIED
+>
+
+<!ELEMENT Light EMPTY>
+<!ATTLIST Light
+  pos                 %vector;    "0 0 0"
+  fwd                 %vector;    "0 0 1"
+  rotation            %vector;    "0 0 0"
+  rotation_order      %axisorder; "xyz"
+  col                 %color;     "#ffffff"
+  light_intensity     %real;      "1.0"
+  light_cone_angle    %real;      "0"
+  light_cone_exponent %real;      "1.0"
+  light_range         %real;      "0.5"
+>
